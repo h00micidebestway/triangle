@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ p.brand }} {{ p.name }}{% endblock %}
+{% block content %}
+<div class="page">
+  <p style="margin-bottom:18px;font-size:13px;color:var(--muted)">
+    <a href="{{ url_for('index') }}">Главная</a> → 
+    <a href="{{ url_for('catalog') }}">Каталог</a> → {{ p.name }}
+  </p>
+
+  <div class="product-detail">
+    <div class="pd-img">
+      {% if p.image_url %}
+        <img src="{{ p.image_url }}" alt="{{ p.name }}">
+      {% else %}
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:80px;">🔵</div>
+      {% endif %}
+    </div>
+
+    <div class="pd-info">
+      <div>
+        {% set s_map = {'summer':'Лето ☀️','winter':'Зима ❄️','allseason':'Всесезон 🌦️'} %}
+        {% set s_cls = {'summer':'badge-summer','winter':'badge-winter','allseason':'badge-allseason'} %}
+        <span class="badge {{ s_cls.get(p.season,'badge-allseason') }}" style="margin-bottom:10px;display:inline-block">{{ s_map.get(p.season, p.season) }}</span>
+      </div>
+      <p style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">{{ p.brand }}</p>
+      <h1>{{ p.name }}</h1>
+      <div class="pd-price">{{ "{:,.0f}".format(p.price).replace(',',' ') }} ₽</div>
+
+      {% if p.stock > 0 %}
+        <p style="color:#16a34a;font-weight:700;font-size:14px">✓ В наличии ({{ p.stock }} шт.)</p>
+      {% else %}
+        <p class="out">✗ Нет в наличии</p>
+      {% endif %}
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="sl">Типоразмер</div><div class="sv">{{ p.size }}</div></div>
+        <div class="spec-item"><div class="sl">Сезонность</div><div class="sv">{{ s_map.get(p.season, p.season) }}</div></div>
+        {% if p.speed_index %}<div class="spec-item"><div class="sl">Индекс скорости</div><div class="sv">{{ p.speed_index }}</div></div>{% endif %}
+        {% if p.load_index  %}<div class="spec-item"><div class="sl">Индекс нагрузки</div><div class="sv">{{ p.load_index }}</div></div>{% endif %}
+      </div>
+
+      {% if p.description %}
+      <p style="font-size:14px;line-height:1.7;color:var(--text)">{{ p.description }}</p>
+      {% endif %}
+
+      {% if p.stock > 0 %}
+      <form method="post" action="{{ url_for('cart_add', pid=p.id) }}" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div class="qty-row">
+          <label style="font-size:13px;font-weight:600">Количество:</label>
+          <div class="qty-ctrl">
+            <button type="button" onclick="changeQty(-1)">−</button>
+            <span id="qty-display">1</span>
+            <button type="button" onclick="changeQty(1)">+</button>
+          </div>
+          <input type="hidden" name="qty" id="qty-input" value="1">
+        </div>
+        <button type="submit" class="btn btn-accent">В корзину 🛒</button>
+      </form>
+      {% else %}
+        <a href="{{ url_for('preorder') }}" class="btn btn-primary">Оформить предзаказ</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if related %}
+  <section class="section" style="margin-top:48px">
+    <h2 class="section-title">Похожие шины</h2>
+    <div class="products-grid">
+      {% for rp in related %}
+      <div class="product-card">
+        <div class="pc-img">
+          {% if rp.image_url %}<img src="{{ rp.image_url }}" alt="{{ rp.name }}" loading="lazy">{% endif %}
+        </div>
+        <div class="pc-body">
+          <div class="pc-brand">{{ rp.brand }}</div>
+          <div class="pc-name">{{ rp.name }}</div>
+          <div class="pc-size">{{ rp.size }}</div>
+          <div class="pc-price">{{ "{:,.0f}".format(rp.price).replace(',',' ') }} ₽</div>
+        </div>
+        <div class="pc-actions">
+          <a href="{{ url_for('product', pid=rp.id) }}" class="btn btn-outline btn-sm">Подробнее</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<script>
+let qty = 1;
+function changeQty(d){
+  qty = Math.max(1, qty + d);
+  document.getElementById('qty-display').textContent = qty;
+  document.getElementById('qty-input').value = qty;
+}
+</script>
+{% endblock %}
