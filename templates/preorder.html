@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Предзаказ{% endblock %}
+{% block content %}
+<div class="form-page" style="max-width:560px">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div style="font-size:48px;margin-bottom:10px">📋</div>
+    <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Предзаказ шин</h1>
+    <p style="color:var(--muted);font-size:14px">Не нашли нужный типоразмер? Оставьте заявку — мы найдём и привезём!</p>
+  </div>
+  <div class="form-card">
+    <form method="post">
+      {% if not user %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ваше имя</label>
+          <input name="name" placeholder="Иван Иванов" required>
+        </div>
+        <div class="form-group">
+          <label>Email для связи</label>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </div>
+      </div>
+      {% else %}
+      <input type="hidden" name="name" value="{{ user.name }}">
+      <input type="hidden" name="email" value="{{ user.email }}">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Заявка будет привязана к вашему аккаунту: <strong>{{ user.email }}</strong></p>
+      {% endif %}
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Типоразмер *</label>
+          <input name="size" required placeholder="Пример: 265/70 R17">
+        </div>
+        <div class="form-group">
+          <label>Сезонность</label>
+          <select name="season">
+            <option value="summer">Летние</option>
+            <option value="winter">Зимние</option>
+            <option value="allseason">Всесезонные</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Комментарий (бренд, модель, пожелания)</label>
+        <textarea name="comment" placeholder="Например: Michelin, Pirelli или аналог. Нужно 4 штуки…"></textarea>
+      </div>
+      <button type="submit" class="btn btn-accent btn-block">Отправить заявку</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

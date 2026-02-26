@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Мои заказы{% endblock %}
+{% block content %}
+<div class="page" style="max-width:720px">
+  <h1 class="section-title" style="margin-bottom:24px">Мои заказы</h1>
+
+  {% if orders %}
+    {% for o in orders %}
+    <a href="{{ url_for('order_detail', oid=o.id) }}" class="order-card" style="display:block;text-decoration:none;color:inherit;">
+      <div class="oc-head">
+        <strong>Заказ № {{ o.id }}</strong>
+        <span class="os os-{{ o.status_name }}">{{ o.status_name }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--muted)">
+        <span>📅 {{ o.created_at[:10] if o.created_at else '—' }}</span>
+        <span style="font-weight:800;font-size:15px;color:var(--accent)">{{ "{:,.0f}".format(o.total).replace(',',' ') }} ₽</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">
+        📍 {{ o.delivery_city }}{% if o.delivery_street %}, {{ o.delivery_street }}{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <div class="ei">📦</div>
+      <h3>Заказов пока нет</h3>
+      <p style="margin-bottom:20px">Перейдите в каталог и оформите первый заказ</p>
+      <a href="{{ url_for('catalog') }}" class="btn btn-primary">Перейти в каталог</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
